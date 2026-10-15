@@ -103,6 +103,17 @@ class TestFIT2D(unittest.TestCase):
         res = _test_export(tilt=20, tpr=580)
         self.assertFalse(res, res)
 
+    def test_setFit2D_pixel_size_update(self):
+        """Explicit pixel sizes override the ones of the current detector, see #2960"""
+        ai = AzimuthalIntegrator()
+        ai.setFit2D(1000, 0, 1094, 0, 0, 172.0, 172.0)
+        ai.setFit2D(69.148, 883.511, 559.708, 0.298, -82.238, 100.0, 50.0)
+        self.assertAlmostEqual(ai.detector.pixel1, 50e-6)
+        self.assertAlmostEqual(ai.detector.pixel2, 100e-6)
+        f2d = ai.getFit2D()
+        self.assertAlmostEqual(f2d["centerX"], 883.511)
+        self.assertAlmostEqual(f2d["centerY"], 559.708)
+
     def test_ImageD11(self):
         ai = AzimuthalIntegrator()
         ai.setFit2D(100, centerX=99, centerY=111, tilt=20, tiltPlanRotation=80, pixelX=50, pixelY=60)

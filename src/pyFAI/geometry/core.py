@@ -1812,10 +1812,16 @@ class Geometry:
         :param splinefile: name of the file containing the spline
         :param detector: name of the detector or detector object
         """
+        explicit_pixel = pixelX is not None or pixelY is not None
         pixelX = pixelX if pixelX is not None else self.detector.pixel2 * 1e6
         pixelY = pixelY if pixelY is not None else self.detector.pixel1 * 1e6
         splinefile = splinefile if splinefile is not None else self.detector.splinefile
-        detector = detector if detector is not None else self.detector
+        if detector is None:
+            detector = self.detector
+            if explicit_pixel:
+                # explicit pixel sizes take precedence over the current detector (#2960)
+                detector = copy.copy(detector)
+                detector.setFit2D(pixelX=pixelX, pixelY=pixelY)
         wavelength = (
             wavelength
             if wavelength
